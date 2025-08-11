@@ -170,6 +170,35 @@ def _get_month_number(m: str) -> int:
     return _MONTH_NUMBERS[m.lower()[:3].strip()]
 
 
+
+def _get_style(style_name):
+    # If style_name is one of the known built-in simple names, import accordingly
+    built_in_styles = {"plain", "alpha", "unsrt", "unsrtalpha"}
+
+    if style_name in built_in_styles:
+        formatter = importlib.import_module(f"pybtex.style.formatting.{style_name}")
+        style = formatter.Style()
+        return style
+
+    # Else try to import custom style given as full module path
+    # e.g. style_name = "my_pybtex_styles.MyCustomStyle"
+    if '.' in style_name:
+        mod_name, class_name = style_name.rsplit('.', 1)
+        try:
+            mod = importlib.import_module(mod_name)
+            style_class = getattr(mod, class_name)
+            style = style_class()
+            return style
+        except (ModuleNotFoundError, AttributeError) as e:
+            logger.error(f"Failed to import custom style '{style_name}': {e}")
+
+    # Fallback to plain style on failure
+    logger.error(f"Unsupported formatting style `{style_name}`, defaulting to `plain`")
+    import pybtex.style.formatting.plain
+    style = pybtex.style.formatting.plain.Style()
+    return style
+
+
 def generate_context(
     bibdata: typing.Sequence[pybtex.database.BibliographyData],
     style_name: str,
@@ -214,16 +243,7 @@ def generate_context(
     import pybtex.backends.html
     import pybtex.database
 
-    if style_name in ("plain", "alpha", "unsrt", "unsrtalpha"):
-        formatter = importlib.import_module(f"pybtex.style.formatting.{style_name}")
-        style = formatter.Style()
-    else:
-        logger.error(
-            f"Unsupported formatting style `{style_name}`, defaulting to `plain`"
-        )
-        import pybtex.style.formatting.plain
-
-        style = pybtex.style.formatting.plain.Style()
+    style = _get_style(style_name)
 
     # format all entries in a single shot for speed and meaningful labels
     all_entries = [e for k in bibdata for e in k.entries.values()]
