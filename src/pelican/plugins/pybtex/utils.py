@@ -190,7 +190,7 @@ def _get_style(style_name):
             logger.exception(f"Failed to import custom style '{style_name}'")
 
     # Fallback to plain style on failure
-    logger.error(f"Unsupported formatting style `{style_name}`, defaulting to `plain`")
+    logger.error(f"Unsupported formatting style '{style_name}', defaulting to 'plain'")
     import pybtex.style.formatting.plain
 
     return pybtex.style.formatting.plain.Style()
