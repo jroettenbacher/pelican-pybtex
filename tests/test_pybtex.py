@@ -721,6 +721,36 @@ def test_biblio_override(setup_pelican: tuple[list[logging.LogRecord], pathlib.P
     )
 
 
+@pytest.mark.parametrize("subdir", ["custom-style-fallback"])
+def test_custom_style_fallback(
+    setup_pelican: tuple[list[logging.LogRecord], pathlib.Path],
+):
+    records, pelican_output = setup_pelican
+
+    # check that the bibliography still gets build
+    publications_html = pelican_output / "publications.html"
+    assert publications_html.exists()
+
+    with publications_html.open() as f:
+        soup = BeautifulSoup(f, "html.parser")
+
+    div = soup.find_all("div", id="pybtex")
+    assert len(div) == 1
+
+    _assert_log_contains(
+        records,
+        message="Failed to import custom style 'custom_bibtex_style.NotAvailable'",
+        level=logging.ERROR,
+        count=1,
+    )
+    _assert_log_contains(
+        records,
+        message="Unsupported formatting style 'custom_bibtex_style.NotAvailable', defaulting to 'plain'",
+        level=logging.ERROR,
+        count=1,
+    )
+
+
 @pytest.mark.parametrize("subdir", ["custom-style"])
 def test_custom_style(setup_pelican: tuple[list[logging.LogRecord], pathlib.Path]):
     records, pelican_output = setup_pelican
