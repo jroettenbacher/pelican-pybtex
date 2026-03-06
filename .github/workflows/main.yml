@@ -23,8 +23,6 @@ jobs:
         with:
           pixi-version: v0.65.0
           cache: true
-          auth-host: prefix.dev
-          auth-token: ${{ secrets.PREFIX_DEV_TOKEN }}
       - name: Run qa
         run: pixi run -e qa qa
   test:
@@ -47,8 +45,6 @@ jobs:
         with:
           pixi-version: v0.65.0
           cache: true
-          auth-host: prefix.dev
-          auth-token: ${{ secrets.PREFIX_DEV_TOKEN }}
       - name: Run tests
         run: pixi run -e test${{ matrix.python-version }} test-ci
         env:
@@ -101,8 +97,6 @@ jobs:
         with:
           pixi-version: v0.65.0
           cache: true
-          auth-host: prefix.dev
-          auth-token: ${{ secrets.PREFIX_DEV_TOKEN }}
       - name: Build a binary wheel and a source tarball
         run: pixi run -e build build
       - name: Check distribution
