@@ -81,6 +81,7 @@ test-ci = "pytest -sv --cov-report 'html:html/coverage' --cov-report 'xml:covera
 
 [tool.pixi.feature.build.dependencies]
 hatch = "*"
+virtualenv = "<21"
 versioningit = "*"
 twine = "*"
 
